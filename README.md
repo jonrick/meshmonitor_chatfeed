@@ -30,8 +30,14 @@ A web-based real-time chat feed (think Twitter/X) for Meshtastic nodes running [
     python main.py
     ```
 
-3.  **Docker**:
+3.  **Docker / Docker Compose**:
+    The easiest way to run the app in production is via Docker Compose:
+    ```bash
+    docker compose up -d
+    ```
+
+    Or, manually using plain Docker:
     ```bash
     docker build -t mesh-chat-feed .
-    docker run -p 8000:8000 --env-file .env mesh-chat-feed
+    docker run -d -p 8000:8000 --env-file .env mesh-chat-feed
     ```
