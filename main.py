@@ -1,6 +1,6 @@
 import os
+from datetime import datetime, timezone
 import httpx
-from datetime import datetime
 from typing import List, Optional, Union, Any
 import asyncio
 from fastapi import FastAPI, Request
@@ -19,6 +19,7 @@ POLL_INTERVAL = int(os.getenv("POLL_INTERVAL_SECONDS", "10"))
 LIMIT = int(os.getenv("MESSAGE_LIMIT", "50"))
 PAGE_TITLE = os.getenv("PAGE_TITLE", "MeshMonitor")
 PAGE_SUBTITLE = os.getenv("PAGE_SUBTITLE", "Real-time Chat Feed")
+APP_VERSION = "0.0.2"
 
 app = FastAPI(title="MeshMonitor Chat Feed")
 templates = Jinja2Templates(directory="templates")
@@ -213,6 +214,27 @@ def format_timestamp(ts: Union[str, int]) -> str:
         print(f"WARNING: Could not parse timestamp '{ts}': {e}")
         return str(ts)
 
+def iso_timestamp(ts: Union[str, int]) -> str:
+    if not ts:
+        return ""
+    try:
+        if isinstance(ts, int):
+            if ts > 10**12:
+                dt = datetime.fromtimestamp(ts / 1000.0, tz=timezone.utc)
+            else:
+                dt = datetime.fromtimestamp(ts, tz=timezone.utc)
+            return dt.isoformat()
+        clean_ts = str(ts)
+        if clean_ts.endswith("Z"):
+            clean_ts = clean_ts.replace("Z", "+00:00")
+        # Ensure it has timezone info if parsed as ISO
+        dt = datetime.fromisoformat(clean_ts)
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        return dt.isoformat()
+    except Exception as e:
+        return str(ts)
+
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
     messages = await fetch_messages()
@@ -223,8 +245,10 @@ async def index(request: Request):
             "messages": messages,
             "poll_interval": POLL_INTERVAL,
             "format_timestamp": format_timestamp,
+            "iso_timestamp": iso_timestamp,
             "page_title": PAGE_TITLE,
-            "page_subtitle": PAGE_SUBTITLE
+            "page_subtitle": PAGE_SUBTITLE,
+            "app_version": APP_VERSION
         }
     )
 
@@ -236,7 +260,8 @@ async def chat_feed_fragment(request: Request):
         name="fragments/message_list.html", 
         context={
             "messages": messages,
-            "format_timestamp": format_timestamp
+            "format_timestamp": format_timestamp,
+            "iso_timestamp": iso_timestamp
         }
     )
 

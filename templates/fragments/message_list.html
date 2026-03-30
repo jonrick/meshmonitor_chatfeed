@@ -1,6 +1,13 @@
 {% if not messages %}
-    <div class="glass rounded-3xl p-12 text-center text-slate-400">
-        <p class="text-xl">Waiting for messages from the mesh...</p>
+    <div class="glass rounded-3xl p-16 text-center text-slate-400 flex flex-col items-center justify-center">
+        <div class="relative w-16 h-16 mb-6">
+            <div class="absolute inset-0 rounded-full border-2 border-violet-500/20"></div>
+            <div class="absolute inset-2 rounded-full border-2 border-violet-500/40"></div>
+            <div class="absolute inset-4 rounded-full border-2 border-violet-500/60"></div>
+            <div class="absolute inset-0 rounded-full border-t-2 border-violet-400 animate-[spin_3s_linear_infinite]"></div>
+            <div class="absolute inset-0 bg-violet-500/10 rounded-full animate-pulse"></div>
+        </div>
+        <p class="text-xl font-light text-slate-300 tracking-wide">Scanning the mesh for activity...</p>
     </div>
 {% endif %}
 
@@ -17,9 +24,14 @@
             </div>
             
             <div class="flex items-center gap-2.5">
-                <span class="text-[10px] text-slate-500 font-mono tracking-widest">{{ msg.fromNodeId }}</span>
+                <div class="group/nodeidx flex items-center gap-1">
+                    <span class="text-[10px] text-slate-500 font-mono tracking-widest">{{ msg.fromNodeId }}</span>
+                    <button type="button" class="opacity-0 group-hover/nodeidx:opacity-100 transition-opacity p-0.5 text-slate-500 hover:text-white" title="Copy Node ID" onclick="copyToClipboard('{{ msg.fromNodeId }}', this)">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                    </button>
+                </div>
                 <span class="text-slate-700/80">•</span>
-                <time class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">
+                <time datetime="{{ iso_timestamp(msg.timestamp) }}" class="relative-time text-[10px] text-slate-400 uppercase tracking-wider font-semibold" title="{{ format_timestamp(msg.timestamp) }}">
                     {{ format_timestamp(msg.timestamp) }}
                 </time>
                 {% if msg.viaMqtt %}
@@ -35,9 +47,16 @@
             <div class="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-violet-500 to-pink-500 opacity-80"></div>
             <div class="flex items-center gap-2 mb-2 pl-2">
                 <span class="font-semibold text-slate-300">{{ msg.parent_msg.fromLongName or msg.parent_msg.fromNodeId }}</span>
-                <span class="text-[10px] text-slate-500 font-mono">{{ msg.parent_msg.fromNodeId }}</span>
+                <div class="group/pnode flex items-center gap-1">
+                    <span class="text-[10px] text-slate-500 font-mono">{{ msg.parent_msg.fromNodeId }}</span>
+                    <button type="button" class="opacity-0 group-hover/pnode:opacity-100 transition-opacity p-0.5 text-slate-500 hover:text-white" title="Copy Node ID" onclick="copyToClipboard('{{ msg.parent_msg.fromNodeId }}', this)">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                    </button>
+                </div>
                 <span class="text-slate-600 text-[10px]">•</span>
-                <time class="text-[10px] text-slate-500">{{ format_timestamp(msg.parent_msg.timestamp) }}</time>
+                <time datetime="{{ iso_timestamp(msg.parent_msg.timestamp) }}" class="relative-time text-[10px] text-slate-500" title="{{ format_timestamp(msg.parent_msg.timestamp) }}">
+                    {{ format_timestamp(msg.parent_msg.timestamp) }}
+                </time>
             </div>
             <p class="text-slate-300 line-clamp-3 pl-2 italic">"{{ msg.parent_msg.text }}"</p>
         </div>

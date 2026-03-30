@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MeshMonitor | Chat Feed</title>
+    <title>{{ page_title }} | Chat Feed</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📻</text></svg>">
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
     <script src="https://unpkg.com/idiomorph/dist/idiomorph-ext.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -23,7 +24,8 @@
 
         body {
             font-family: 'Outfit', sans-serif;
-            background-color: #050511; /* Deeper dark for more contrast */
+            background-color: #050511;
+            /* Deeper dark for more contrast */
             color: #f8fafc;
             min-height: 100vh;
         }
@@ -63,9 +65,15 @@
 <body class="p-4 md:p-8 relative selection:bg-violet-500/30 overflow-x-hidden">
     <!-- Ambient Background Lighting (Orbs) -->
     <div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
-        <div class="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] rounded-full bg-violet-600/30 blur-[120px] mix-blend-screen animate-[pulse_8s_ease-in-out_infinite]"></div>
-        <div class="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] rounded-full bg-pink-600/20 blur-[120px] mix-blend-screen animate-[pulse_10s_ease-in-out_infinite_reverse]"></div>
-        <div class="absolute top-[30%] left-[50%] w-[40%] h-[40%] rounded-full bg-blue-600/10 blur-[100px] mix-blend-screen animate-[pulse_12s_ease-in-out_infinite]"></div>
+        <div
+            class="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] rounded-full bg-violet-600/30 blur-[120px] mix-blend-screen animate-[pulse_8s_ease-in-out_infinite]">
+        </div>
+        <div
+            class="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] rounded-full bg-pink-600/20 blur-[120px] mix-blend-screen animate-[pulse_10s_ease-in-out_infinite_reverse]">
+        </div>
+        <div
+            class="absolute top-[30%] left-[50%] w-[40%] h-[40%] rounded-full bg-blue-600/10 blur-[100px] mix-blend-screen animate-[pulse_12s_ease-in-out_infinite]">
+        </div>
     </div>
 
     <div class="max-w-4xl mx-auto relative z-10">
@@ -75,9 +83,9 @@
                 {{ page_title }}
             </h1>
             {% if page_subtitle %}
-            <p class="text-slate-400 font-light flex items-center justify-center gap-2">
-                <span class="inline-block w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                {{ page_subtitle }}
+            <p class="text-slate-400 font-light flex items-center justify-center gap-2" id="connection-status">
+                <span id="connection-dot" class="inline-block w-2 h-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.6)] transition-colors duration-300"></span>
+                <span id="connection-text" data-original="{{ page_subtitle }}" class="transition-colors duration-300">{{ page_subtitle }}</span>
             </p>
             {% endif %}
         </header>
@@ -87,10 +95,84 @@
             {% include "fragments/message_list.html" %}
         </main>
 
-        <footer class="mt-12 text-center text-slate-500 text-sm">
-            <p></p>
+        <footer class="mt-12 mb-8 flex flex-col items-center justify-center gap-4 text-slate-500 text-sm">
+            <a href="https://github.com/jonrick/meshmonitor_chatfeed" target="_blank" rel="noopener noreferrer"
+                class="text-slate-400 hover:text-white transition-colors duration-200 flex items-center gap-2">
+                <svg viewBox="0 0 24 24" class="w-6 h-6 fill-current" aria-hidden="true">
+                    <path fill-rule="evenodd" clip-rule="evenodd"
+                        d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z">
+                    </path>
+                </svg>
+                <span class="font-medium mono">v{{ app_version }}</span>
+            </a>
         </footer>
     </div>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // HTMX Error Handling
+            document.body.addEventListener('htmx:sendError', function () {
+                const dot = document.getElementById('connection-dot');
+                const text = document.getElementById('connection-text');
+                if (dot && text) {
+                    dot.className = 'inline-block w-2 h-2 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)] transition-colors duration-300';
+                    text.innerText = 'Reconnecting...';
+                    text.classList.remove('text-slate-400');
+                    text.classList.add('text-red-400');
+                }
+            });
+
+            document.body.addEventListener('htmx:afterOnLoad', function (evt) {
+                const dot = document.getElementById('connection-dot');
+                const text = document.getElementById('connection-text');
+                if (dot && text && text.innerText === 'Reconnecting...') {
+                    dot.className = 'inline-block w-2 h-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.6)] transition-colors duration-300';
+                    text.innerText = text.getAttribute('data-original');
+                    text.classList.remove('text-red-400');
+                    text.classList.add('text-slate-400');
+                }
+                updateTimestamps();
+            });
+
+            // Relative timestamps
+            function updateTimestamps() {
+                const now = new Date();
+                document.querySelectorAll('time.relative-time').forEach(el => {
+                    const dtStr = el.getAttribute('datetime');
+                    if (!dtStr) return;
+                    
+                    const dt = new Date(dtStr);
+                    const diffMs = now - dt;
+                    const diffSec = Math.floor(diffMs / 1000);
+                    const diffMin = Math.floor(diffSec / 60);
+                    const diffHour = Math.floor(diffMin / 60);
+                    const diffDay = Math.floor(diffHour / 24);
+
+                    let relative = '';
+                    if (diffSec < 15) relative = 'just now';
+                    else if (diffSec < 60) relative = diffSec + 's ago';
+                    else if (diffMin < 60) relative = diffMin + 'm ago';
+                    else if (diffHour < 24) relative = diffHour + 'h ago';
+                    else relative = diffDay + 'd ago';
+
+                    el.innerText = relative;
+                });
+            }
+
+            // Run on load and periodically
+            updateTimestamps();
+            setInterval(updateTimestamps, 30000);
+            
+            // Expose globally for inline onclick handlers
+            window.copyToClipboard = function(text, btn) {
+                navigator.clipboard.writeText(text).then(() => {
+                    const originalHTML = btn.innerHTML;
+                    btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-green-400"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+                    setTimeout(() => { btn.innerHTML = originalHTML; }, 2000);
+                });
+            };
+        });
+    </script>
 </body>
 
 </html>
