@@ -19,7 +19,7 @@ POLL_INTERVAL = int(os.getenv("POLL_INTERVAL_SECONDS", "10"))
 LIMIT = int(os.getenv("MESSAGE_LIMIT", "50"))
 PAGE_TITLE = os.getenv("PAGE_TITLE", "MeshMonitor")
 PAGE_SUBTITLE = os.getenv("PAGE_SUBTITLE", "Real-time Chat Feed")
-APP_VERSION = "0.0.2"
+APP_VERSION = "0.0.3"
 
 app = FastAPI(title="MeshMonitor Chat Feed")
 templates = Jinja2Templates(directory="templates")

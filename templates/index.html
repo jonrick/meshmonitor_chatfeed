@@ -122,7 +122,7 @@
                 }
             });
 
-            document.body.addEventListener('htmx:afterOnLoad', function (evt) {
+            document.body.addEventListener('htmx:afterSettle', function (evt) {
                 const dot = document.getElementById('connection-dot');
                 const text = document.getElementById('connection-text');
                 if (dot && text && text.innerText === 'Reconnecting...') {
