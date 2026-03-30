@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Environment variables with defaults
-API_BASE_URL = os.getenv("MESH_MONITOR_API_BASE_URL", "https://meshmonitor.home.jonrick.com").rstrip("/")
+API_BASE_URL = os.getenv("MESH_MONITOR_API_BASE_URL", "").rstrip("/")
 API_TOKEN = os.getenv("MESH_MONITOR_API_TOKEN", "")
 POLL_INTERVAL = int(os.getenv("POLL_INTERVAL_SECONDS", "10"))
 LIMIT = int(os.getenv("MESSAGE_LIMIT", "50"))
