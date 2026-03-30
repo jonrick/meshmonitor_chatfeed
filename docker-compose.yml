@@ -1,8 +1,6 @@
-version: '3.8'
-
 services:
   app:
-    build: .
+    image: ghcr.io/jonrick/meshmonitor_chatfeed:latest
     container_name: meshmonitor_chatfeed
     ports:
       - "8000:8000"
